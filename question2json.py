@@ -22,6 +22,7 @@ def generate_question(TypeAnswer):
     генерация одного вопроса
     """
 
+    var_question = input("Введите имя переменной для вопроса: ")
     s_question = input("Введите вопрос: ")
 
     print("\nВыберите тип ответа: ")
@@ -40,6 +41,7 @@ def generate_question(TypeAnswer):
 
     if TypeAnswer[s_type_answer] != 'list':
         quest_anketa = {
+            'var': var_question,
             'question': s_question,
             'answer': {
                 'type': TypeAnswer[s_type_answer]
@@ -62,6 +64,7 @@ def generate_question(TypeAnswer):
                 n_answer = n_answer + 1
 
         quest_anketa = {
+            'var': var_question,
             'question': s_question,
             'answer': {
                 'type': TypeAnswer[s_type_answer],
@@ -95,7 +98,7 @@ def generate_conversation(TypeAnswer):
 if __name__ == "__main__":
     questions = generate_conversation(AllTypeAnswer)
     # конвертируем в JSON:
-    y = json.dumps(questions)
+    y = json.dumps(questions, ensure_ascii=False)
     # в результате получаем строк JSON:
     print(y)
 

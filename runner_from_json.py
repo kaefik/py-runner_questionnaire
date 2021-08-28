@@ -4,8 +4,10 @@
 
 import json
 
+from utils.i_utils import validate_url
+
 types_answer_message = {"int": "число", "string": "строка",
-                        "float": "число с плавающей точкой", "list": "список ответов"}
+                        "float": "число с плавающей точкой", "list": "список ответов", "url": "урл"}
 
 
 def runner(all_question, command_exit="exit"):
@@ -36,6 +38,8 @@ def runner(all_question, command_exit="exit"):
 
         if answer == command_exit:
             return None
+
+
 
         if type_answer == "int":
             while not all(x.isdigit() for x in answer):
@@ -76,6 +80,16 @@ def runner(all_question, command_exit="exit"):
             while flag_exit:
                 if answer.strip() == "":
                     print("Нужно чтобы строка была не пустой. Попробуйте еще раз.")
+                    answer = input(">> ")
+                else:
+                    flag_exit = False
+            result_data[var_question] = answer
+
+        if type_answer == "url":
+            flag_exit = True
+            while flag_exit:
+                if not validate_url(answer):
+                    print("Введите урл сайта. Попробуйте еще раз.")
                     answer = input(">> ")
                 else:
                     flag_exit = False

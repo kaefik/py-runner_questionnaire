@@ -14,7 +14,7 @@
 
 import json
 
-AllTypeAnswer = {"1": "int", "2": "float", "3": "string", "4": "list"}
+AllTypeAnswer = {"1": "int", "2": "float", "3": "string", "4": "list", "5": "url"}
 
 
 def generate_question(TypeAnswer):

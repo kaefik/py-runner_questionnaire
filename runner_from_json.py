@@ -8,7 +8,13 @@ types_answer_message = {"int": "число", "string": "строка",
                         "float": "число с плавающей точкой", "list": "список ответов"}
 
 
-def runner(all_question):
+def runner(all_question, command_exit="exit"):
+    """
+    запуск беседы используя сценарий из json
+    param: all_question - вопросы
+           command_exit - команды прерывания из беседы
+    return: словарь ответов на вопросы
+    """
     result_data = {}
 
     for num in range(len(all_question)):
@@ -18,13 +24,18 @@ def runner(all_question):
         print(question["question"])
         type_answer = question["answer"]["type"]
         print(f"Ответ должен быть {types_answer_message[type_answer]}")
+
         if type_answer == "list":
             list_answer = question["answer"]["list_answer"]
             print("Нужно выбрать цифрой ответ из списка:")
             for i in range(len(list_answer)):
                 print(f"{i + 1} - {list_answer[i]}")
 
+        print(f"Для выхода введите команду: {command_exit}")
         answer = input(">> ")
+
+        if answer == command_exit:
+            return None
 
         if type_answer == "int":
             while not all(x.isdigit() for x in answer):

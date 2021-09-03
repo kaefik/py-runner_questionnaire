@@ -60,6 +60,26 @@ class Question:
         return result
 
 
+class Answer(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.geometry("400x200")
+        self.answer = tk.StringVar()
+        self.label = tk.Label(self, text="Добавление ответа")
+        self.entryAnswer = tk.Entry(self, width=40, textvariable=self.answer)
+        self.button = tk.Button(self, text="Закрыть", command=self.destroy)
+
+        self.label.pack(padx=20, pady=20)
+        self.entryAnswer.pack()
+        self.button.pack(pady=5, ipadx=2, ipady=2)
+
+    def open(self):
+        self.grab_set()
+        self.wait_window()
+        text_answer = self.answer.get()
+        return text_answer
+
+
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -127,6 +147,7 @@ class App(tk.Tk):
         list_answer = []  # TODO: сделать получения вариантов ответов
         if types_question == Types.list.value:
             # здесь нужно запускать диалоговые окна для получения вариантов ответов
+            self.open_window()
             pass
 
         question = Question(question=self.entryQuestion.get(),
@@ -137,6 +158,10 @@ class App(tk.Tk):
 
     def print_option(self):
         print(self.var.get())
+
+    def open_window(self):
+        answer = Answer(self)
+        print(answer.open())
 
 
 if __name__ == "__main__":

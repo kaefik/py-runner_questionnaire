@@ -1,10 +1,10 @@
 """
 GUI для создания json-бесед
 """
-
+import json
 import tkinter as tk
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 
 class Types(Enum):
@@ -33,6 +33,7 @@ class Question:
     def to_dict(self):
         """
         {
+          'var': "имя_переменной",
           'question': "текст вопроса",
           'answer': {
             'type': тип_ответа,
@@ -42,6 +43,7 @@ class Question:
         """
         if self.list_answer:
             result = {
+                "var": self.variable,
                 "question": self.question,
                 "answer": {
                     "type": self.types,
@@ -51,6 +53,7 @@ class Question:
             }
         else:
             result = {
+                "var": self.variable,
                 "question": self.question,
                 "answer": {
                     "type": self.types
@@ -63,20 +66,38 @@ class Question:
 class Answer(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
+
+        self.flag_exit = False
+
         self.geometry("400x200")
         self.answer = tk.StringVar()
         self.label = tk.Label(self, text="Добавление ответа")
         self.entryAnswer = tk.Entry(self, width=40, textvariable=self.answer)
-        self.button = tk.Button(self, text="Закрыть", command=self.destroy)
+        self.buttonNext = tk.Button(self, text="Добавить", command=self.add_button)
+        self.buttonExit = tk.Button(self, text="Закрыть", command=self.exit_button)
 
         self.label.pack(padx=20, pady=20)
         self.entryAnswer.pack()
-        self.button.pack(pady=5, ipadx=2, ipady=2)
+        self.buttonNext.pack(pady=5, ipadx=2, ipady=2)
+        self.buttonExit.pack(pady=5, ipadx=2, ipady=2)
 
-    def open(self):
+        self.entryAnswer.focus()
+
+    def add_button(self):
+        self.flag_exit = False
+        self.destroy()
+
+    def exit_button(self):
+        self.flag_exit = True
+        self.destroy()
+
+    def open(self) -> Optional[str]:
         self.grab_set()
         self.wait_window()
-        text_answer = self.answer.get()
+        if self.flag_exit:
+            text_answer = None
+        else:
+            text_answer = self.answer.get()
         return text_answer
 
 
@@ -101,7 +122,7 @@ class App(tk.Tk):
         self.submit = tk.Button(self, text="Add",
                                 command=self.add_question)
         self.close = tk.Button(self, text="Close",
-                               command=self.quit)
+                               command=self.exit_app)
 
         labelQuestion.grid(row=0, column=0, padx=10, sticky=tk.W)
         self.entryQuestion.grid(row=0, column=1, padx=10, pady=5)
@@ -147,21 +168,44 @@ class App(tk.Tk):
         list_answer = []  # TODO: сделать получения вариантов ответов
         if types_question == Types.list.value:
             # здесь нужно запускать диалоговые окна для получения вариантов ответов
-            self.open_window()
+            flag_exit = True
+            while flag_exit:
+                answer = self.open_window_add_list_answer()
+                if not answer:
+                    flag_exit = False
+                else:
+                    list_answer.append(answer)
             pass
 
         question = Question(question=self.entryQuestion.get(),
-                            variable=self.entryVariable,
+                            variable=self.entryVariable.get(),
                             types=types_question, list_answer=list_answer)
 
-        print(question.to_dict())
+        self.question.append(question.to_dict())
+        # очистка всех полей для ввода нового вопроса
+        self.entryQuestion.delete(0, 'end')
+        self.entryVariable.delete(0, 'end')
+        self.var_types.set("int")
+        self.entryQuestion.focus()
 
     def print_option(self):
         print(self.var.get())
 
-    def open_window(self):
+    def open_window_add_list_answer(self):
         answer = Answer(self)
-        print(answer.open())
+        return answer.open()
+
+    def exit_app(self):
+        # сохранение всех вопросов
+        # конвертируем в JSON:
+        print(self.question)
+        y = json.dumps(self.question, ensure_ascii=False)
+        # в результате получаем строк JSON:
+        print(y)
+
+        with open("example.json", "w") as f:
+            f.write(y)
+        self.quit()
 
 
 if __name__ == "__main__":
